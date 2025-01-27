@@ -26,4 +26,16 @@ public class CarServiceImpl implements CarService {
     public List<Car> getAllCars() {
         return dao.getAllCars();
     }
+
+    public void saveCar(Car car) {
+        dao.saveCar(car);
+    }
+
+    public void updateCar(Car car) {
+        dao.updateCar(car);
+    }
+
+    public void deleteCarById(int id) {
+        dao.deleteCarById(id);
+    }
 }

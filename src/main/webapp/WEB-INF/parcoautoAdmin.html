@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Parco Car (ADMIN)</title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+<h2>Gestione Parco Car</h2>
+<a th:href="@{/admin/new-car}">Aggiungi Nuova Auto</a>
+<table>
+    <thead>
+    <tr>
+        <th>Modello</th>
+        <th>Marca</th>
+        <th>Anno</th>
+        <th>Disponibile</th>
+        <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="car : ${carList}">
+        <td th:text="${car.model}"></td>
+        <td th:text="${car.brand}"></td>
+        <td th:text="${car.year}"></td>
+        <td th:text="${car.availability}"></td>
+        <td>
+            <a th:href="@{/admin/edit-car/{id}(id=${car.id})}">Modifica</a>
+            <a th:href="@{/admin/delete-car/{id}(id=${car.id})}"
+               onclick="return confirm('Confermi la cancellazione?')">Cancella</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

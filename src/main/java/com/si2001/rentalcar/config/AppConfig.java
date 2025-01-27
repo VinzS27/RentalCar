@@ -36,13 +36,8 @@ public class AppConfig {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
         viewResolver.setViewClass(JstlView.class);
         viewResolver.setPrefix("/WEB-INF/");
-        viewResolver.setSuffix(".jsp");
+        viewResolver.setSuffix(".html");
         registry.viewResolver(viewResolver);
-    }
-
-    //for css
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("/static/");
     }
 
     public void addFormatters(FormatterRegistry registry) {

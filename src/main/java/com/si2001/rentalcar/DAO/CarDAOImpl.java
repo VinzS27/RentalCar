@@ -18,6 +18,10 @@ public class CarDAOImpl extends AbstractDao<Integer, Car> implements CarDAO {
                 .getResultList();
     }
 
+    public void updateCar(Car car) {
+        update(car);
+    }
+
     public void saveCar(Car car) {
         persist(car);
     }

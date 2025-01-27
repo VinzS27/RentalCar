@@ -31,4 +31,20 @@ public class ReservationServiceImpl implements ReservationService {
     public List<Reservation> getAllReservations() {
         return dao.getAllReservations();
     }
+
+    public List<Reservation> getReservationsByUsername(String username) {
+        return dao.getReservationsByUsername(username);
+    }
+
+    public void saveReservation(Reservation reservation) {
+        dao.saveReservation(reservation);
+    }
+
+    public void updateReservation(Reservation reservation) {
+        dao.updateReservation(reservation);
+    }
+
+    public void deleteReservationById(int id) {
+        dao.deleteReservationById(id);
+    }
 }

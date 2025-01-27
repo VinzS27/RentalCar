@@ -13,4 +13,6 @@ public interface CarDAO {
     void deleteCarById(int id);
 
     List<Car> getAllCars();
+
+    void updateCar(Car car);
 }

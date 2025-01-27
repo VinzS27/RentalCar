@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Homepage</title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<!-- Contenuto per ADMIN -->
+<div th:if="${#authentication.principal.authorities.?contains('ROLE_ADMIN')}">
+    <h2>Gestione Utenti</h2>
+    <a th:href="@{/admin/new-user}">Aggiungi Nuovo Utente</a>
+    <input type="text" placeholder="Cerca..." th:oninput="filterUsers(this.value)">
+    <table>
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Azioni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.password}"></td>
+            <td>
+                <a th:href="@{/admin/edit-user/{id}(id=${user.id})}">Modifica</a>
+                <a th:href="@{/admin/delete-user/{id}(id=${user.id})}"
+                   onclick="return confirm('Confermi la cancellazione?')">Cancella</a>
+                <a th:href="@{/admin/prenotazioni/{id}(id=${user.id})}">Prenotazioni</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Contenuto per CUSTOMER -->
+<div th:if="${#authentication.principal.authorities.?contains('ROLE_CUSTOMER')}">
+    <h2>Le Tue Prenotazioni</h2>
+    <a th:href="@{/customer/new-reservation}">Aggiungi Reservation</a>
+    <table>
+        <thead>
+        <tr>
+            <th>Modello</th>
+            <th>Marca</th>
+            <th>Anno</th>
+            <th>Data Inizio</th>
+            <th>Data Fine</th>
+            <th>Azioni</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${reservations}">
+            <td th:text="${reservation.auto.model}"></td>
+            <td th:text="${reservation.auto.brand}"></td>
+            <td th:text="${reservation.auto.year}"></td>
+            <td th:text="${reservation.startDate}"></td>
+            <td th:text="${reservation.endDate}"></td>
+            <td>
+                <a th:href="@{/customer/edit-reservation/{id}(id=${reservation.id})}"
+                   th:if="${#dates.daysBetween(#dates.createNow(), reservation.dataInizio) >= 2}">Modifica</a>
+                <a th:href="@{/customer/delete-reservation/{id}(id=${reservation.id})}"
+                   onclick="return confirm('Confermi la cancellazione?')"
+                   th:if="${#dates.daysBetween(#dates.createNow(), reservation.dataInizio) >= 2}">Cancella</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

@@ -25,6 +25,17 @@ public class ReservationDAOImpl extends AbstractDao<Integer, Reservation> implem
                 .getSingleResult();
     }
 
+    public List<Reservation> getReservationsByUsername(String username) {
+        return getEntityManager()
+                .createQuery("SELECT r FROM Reservation r WHERE r.user.username LIKE :username", Reservation.class)
+                .setParameter("username", username)
+                .getResultList();
+    }
+
+    public void updateReservation(Reservation reservation) {
+        update(reservation);
+    }
+
     public void saveReservation(Reservation reservation) {
         persist(reservation);
     }

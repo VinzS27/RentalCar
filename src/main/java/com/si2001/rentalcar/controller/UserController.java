@@ -41,12 +41,13 @@ public class UserController {
         this.authenticationTrustResolver = authenticationTrustResolver;
     }
 
-    @RequestMapping(value = {"/", "/list"}, method = RequestMethod.GET)
-    public String listUsers(ModelMap model) {
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-        model.addAttribute("loggedinuser", getPrincipal());
-        return "userslist";
+    @RequestMapping(value = {"/"}, method = RequestMethod.GET)
+    public String homepage(ModelMap model) {
+        String loggedinUser = getPrincipal();
+        List<Reservation> reservations = reservationService.getReservationsByUsername(loggedinUser);
+        model.addAttribute("reservations", reservations);
+        model.addAttribute("loggedinuser", loggedinUser);
+        return "homepage";
     }
 
     @RequestMapping(value = {"/newuser"}, method = RequestMethod.GET)
@@ -116,7 +117,7 @@ public class UserController {
         if (isCurrentAuthenticationAnonymous()) {
             return "login";
         } else {
-            return "redirect:/list";
+            return "redirect:/";
         }
     }
 
@@ -128,6 +129,108 @@ public class UserController {
             SecurityContextHolder.getContext().setAuthentication(null);
         }
         return "redirect:/login?logout";
+    }
+
+    @RequestMapping(value = {"/customer/parco-auto"}, method = RequestMethod.GET)
+    public String viewCars(ModelMap model) {
+        model.addAttribute("cars", carService.getAllCars());
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "parcoautoCostumer";
+    }
+
+    @RequestMapping(value = {"/admin/parco-auto"}, method = RequestMethod.GET)
+    public String manageCars(ModelMap model) {
+        model.addAttribute("cars", carService.getAllCars());
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "parcoautoAdmin";
+    }
+
+    @RequestMapping(value = {"/admin/new-auto"}, method = RequestMethod.GET)
+    public String newCar(ModelMap model) {
+        Car car = new Car();
+        model.addAttribute("car", car);
+        model.addAttribute("edit", false);
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "carRegistration";
+    }
+
+    @RequestMapping(value = {"/admin/new-auto"}, method = RequestMethod.POST)
+    public String saveCar(@Valid Car car, BindingResult result, ModelMap model) {
+        if (result.hasErrors()) {
+            return "carRegistration";
+        }
+        carService.saveCar(car);
+        model.addAttribute("success", "Auto " + car.getModel() + " registrata con successo");
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "redirect:/admin/parco-auto";
+    }
+
+    @RequestMapping(value = {"/admin/edit-auto-{id}"}, method = RequestMethod.GET)
+    public String editCar(@PathVariable int id, ModelMap model) {
+        Car car = carService.getCarById(id);
+        model.addAttribute("car", car);
+        model.addAttribute("edit", true);
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "carRegistration";
+    }
+
+    @RequestMapping(value = {"/admin/edit-auto-{id}"}, method = RequestMethod.POST)
+    public String updateCar(@Valid Car car, BindingResult result, ModelMap model, @PathVariable int id) {
+        if (result.hasErrors()) {
+            return "carRegistration";
+        }
+        carService.updateCar(car);
+        model.addAttribute("success", "Auto " + car.getModel() + " aggiornata con successo");
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "redirect:/admin/parco-auto";
+    }
+
+    @RequestMapping(value = {"/admin/delete-auto-{id}"}, method = RequestMethod.GET)
+    public String deleteCar(@PathVariable int id) {
+        carService.deleteCarById(id);
+        return "redirect:/admin/parco-auto";
+    }
+    
+    @RequestMapping(value = {"/customer/new-reservation"}, method = RequestMethod.GET)
+    public String newReservation(ModelMap model) {
+        Reservation reservation = new Reservation();
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("cars", carService.getAllCars());
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "reservationForm";
+    }
+
+    @RequestMapping(value = {"/customer/new-reservation"}, method = RequestMethod.POST)
+    public String saveReservation(@Valid Reservation reservation, BindingResult result, ModelMap model) {
+        if (result.hasErrors()) {
+            return "reservationForm";
+        }
+        reservationService.saveReservation(reservation);
+        return "redirect:/customer/homepage";
+    }
+
+    @RequestMapping(value = {"/customer/edit-reservation-{id}"}, method = RequestMethod.GET)
+    public String editReservation(@PathVariable int id, ModelMap model) {
+        Reservation reservation = reservationService.getReservationById(id);
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("cars", carService.getAllCars());
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "reservationForm";
+    }
+
+    @RequestMapping(value = {"/customer/edit-reservation-{id}"}, method = RequestMethod.POST)
+    public String updateReservation(@Valid Reservation reservation, BindingResult result, ModelMap model, @PathVariable int id) {
+        if (result.hasErrors()) {
+            return "reservationForm";
+        }
+        reservationService.updateReservation(reservation);
+        return "redirect:/customer/homepage";
+    }
+
+    @RequestMapping(value = {"/customer/delete-reservation-{id}"}, method = RequestMethod.GET)
+    public String deleteReservation(@PathVariable int id) {
+        reservationService.deleteReservationById(id);
+        return "redirect:/customer/homepage";
     }
 
     @ModelAttribute("roles")
