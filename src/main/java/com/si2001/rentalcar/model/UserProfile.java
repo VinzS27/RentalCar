@@ -1,6 +1,7 @@
 package com.si2001.rentalcar.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -49,5 +50,15 @@ public class UserProfile implements Serializable {
         return "UserProfile [id=" + id + ", type=" + type + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        UserProfile that = (UserProfile) o;
+        return Objects.equals(id, that.id) && Objects.equals(type, that.type) && Objects.equals(users, that.users);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, users);
+    }
 }

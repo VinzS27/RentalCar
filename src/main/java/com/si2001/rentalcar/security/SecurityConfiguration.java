@@ -10,6 +10,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,7 +22,7 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration {
+public class SecurityConfiguration extends WebSecurityConfiguration {
 
     final UserDetailsService userDetailsService;
     final PersistentTokenRepository tokenRepository;
@@ -33,13 +35,14 @@ public class SecurityConfiguration {
 
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
+        //auth.userDetailsService(userDetailsService);
         auth.authenticationProvider(authenticationProvider());
     }
 
+    @Autowired
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/", "/registration").hasAnyRole( "ADMIN")
+                        authorize.requestMatchers("/").hasAnyRole( "CUSTOMER","ADMIN")
                                 .requestMatchers("/newuser/**", "/delete-user-*").hasRole("ADMIN")
                                 .requestMatchers("/edit-user-*").hasRole("ADMIN")
                                 .requestMatchers("/profile/**").hasAnyRole("CUSTOMER", "ADMIN")
@@ -57,7 +60,7 @@ public class SecurityConfiguration {
                         .tokenValiditySeconds(86400)) // 24h
 
                 .exceptionHandling(exception ->
-                        exception.accessDeniedPage("/Access_Denied"))
+                        exception.accessDeniedPage("/accessDenied"))
 
                 .csrf(AbstractHttpConfigurer::disable);
 

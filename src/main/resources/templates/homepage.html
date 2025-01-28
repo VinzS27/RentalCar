@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <title>Homepage</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        /* da trasferire su pagina css */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .table th {
+            background: #f4f4f4;
+        }
+
+        .actions a {
+            margin-right: 0.5rem;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .actions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Welcome <span th:text="${loggedIN}">User</span></h1>
+    <div th:replace="fragments/header :: header"></div>
+</header>
+
+<div class="container">
+
+    <!-- Area ADMIN -->
+    <div sec:authorize="hasRole('ADMIN')">
+        <h2>Gestione Utenti</h2>
+        <a th:href="@{/registration}" class="btn">Aggiungi Utente</a>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>Ruolo</th>
+                <th>Azioni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${userList}">
+                <td th:text="${user.username}">Username</td>
+                <td th:text="${user.role}">Ruolo</td>
+                <td class="actions">
+                    <a th:href="@{/view-user/{id}(id=${user.id})}">Visualizza</a>
+                    <a th:href="@{/edit-user/{id}(id=${user.id})}">Modifica</a>
+                    <a th:href="@{/delete-user/{id}(id=${user.id})}"
+                       onclick="return confirm('Sei sicuro di voler cancellare questo utente?');">Cancella</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Area CUSTOMER -->
+    <div sec:authorize="hasRole('CUSTOMER')">
+        <h2>Le Tue Prenotazioni</h2>
+        <a href="#" class="btn">Aggiungi Prenotazione</a>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Auto</th>
+                <th>Data Inizio</th>
+                <th>Data Fine</th>
+                <th>Azioni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="reservation : ${reservationList}">
+                <td th:text="${reservation.startDate}">Data Inizio</td>
+                <td th:text="${reservation.endDate}">Data Fine</td>
+                <td th:text="${reservation.car}">Auto</td>
+                <td class="actions">
+                    <a th:if="${#dates.daysBetween(#dates.createNow(), reservation.startDate) > 2}"
+                       th:href="@{/reservation/edit/{id}(id=${reservation.id})}">Modifica</a>
+                    <a th:if="${#dates.daysBetween(#dates.createNow(), reservation.startDate) > 2}"
+                       th:href="@{/reservation/delete/{id}(id=${reservation.id})}"
+                       onclick="return confirm('Sei sicuro di voler cancellare questa prenotazione?');">Cancella</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

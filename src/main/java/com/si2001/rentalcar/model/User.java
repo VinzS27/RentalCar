@@ -3,6 +3,7 @@ package com.si2001.rentalcar.model;
 import jakarta.persistence.*;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -13,17 +14,16 @@ public class User {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", unique=true, nullable = false)
+    @NotEmpty
     private String username;
 
     @Column(name = "password", nullable = false)
+    @NotEmpty
     private String password;
 
-    @Column(name = "role", nullable = false)
-    private String role;
-
     @NotEmpty
-    @ManyToMany(fetch = FetchType.EAGER,  cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_profile_joinTable",
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "user_profile_id") })
@@ -35,7 +35,6 @@ public class User {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.role = role;
     }
 
     public int getId() {
@@ -62,14 +61,6 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public Set<UserProfile> getUserProfiles() {
         return userProfiles;
     }
@@ -84,7 +75,18 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(userProfiles, user.userProfiles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, password, userProfiles);
     }
 }

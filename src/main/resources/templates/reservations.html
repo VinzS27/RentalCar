@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Elenco Prenotazioni</title>
+</head>
+<body>
+<!-- Header -->
+<div th:replace="fragments/header :: header"></div>
+
+<h1>Elenco Prenotazioni</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Utente</th>
+        <th>Modello Auto</th>
+        <th>Data Inizio</th>
+        <th>Data Fine</th>
+        <th>Stato</th>
+        <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="reservation : ${reservations}">
+        <td th:text="${reservation.user.username}"></td>
+        <td th:text="${reservation.auto.model}"></td>
+        <td th:text="${reservation.startDate}"></td>
+        <td th:text="${reservation.endDate}"></td>
+        <td th:text="${reservation.status}"></td>
+        <td>
+            <a th:href="@{/approve-reservation/{id}(id=${reservation.id})}">Approva</a>
+            <a th:href="@{/decline-reservation/{id}(id=${reservation.id})}">Declina</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
+

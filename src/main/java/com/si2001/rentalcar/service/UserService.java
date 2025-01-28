@@ -22,4 +22,5 @@ public interface UserService {
 	boolean isUsernameUnique(int id, String username);
 
 	void deleteUserByUsername(String ssoId);
+
 }

@@ -1,6 +1,5 @@
 package com.si2001.rentalcar.service;
 
-import com.si2001.rentalcar.DAO.ReservationDAO;
 import com.si2001.rentalcar.DAO.ReservationDAOImpl;
 import com.si2001.rentalcar.model.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +45,17 @@ public class ReservationServiceImpl implements ReservationService {
 
     public void deleteReservationById(int id) {
         dao.deleteReservationById(id);
+    }
+
+    public void approveReservation(int id) {
+        Reservation reservation = dao.getReservationById(id);
+        reservation.setStatus("APPROVED");
+        dao.saveReservation(reservation);
+    }
+
+    public void declineReservation(int id) {
+        Reservation reservation = dao.getReservationById(id);
+        reservation.setStatus("DECLINED");
+        dao.saveReservation(reservation);
     }
 }

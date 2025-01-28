@@ -21,4 +21,8 @@ public interface ReservationService {
     void updateReservation(@Valid Reservation reservation);
 
     void deleteReservationById(int id);
+
+    void approveReservation(int id);
+
+    void declineReservation(int id);
 }

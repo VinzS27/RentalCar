@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nuovo Utente</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 0.5rem 0 0.2rem;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div th:replace="fragments/header :: header"></div>
+</header>
+<div class="form-container">
+    <h2>Aggiungi Nuovo Utente</h2>
+    <form th:action="@{/registration}" th:object="${user}" method="post">
+        <label for="username">Username:<span class="required">*</span></label>
+        <input type="text" id="username" th:field="*{username}" required/>
+        <div th:if="${#fields.hasErrors('username')}" class="error-message">
+            <span th:errors="*{username}">Username error</span>
+        </div>
+
+        <label for="password">Password:<span class="required">*</span></label>
+        <input type="password" id="password" th:field="*{password}" required/>
+        <div th:if="${#fields.hasErrors('password')}" class="error-message">
+            <span th:errors="*{password}">Password error</span>
+        </div>
+
+        <label for="userProfiles">Ruolo:<span class="required">*</span></label>
+        <select id="userProfiles" th:field="*{userProfiles}" required>
+            <option value="" disabled selected>Seleziona un ruolo</option>
+            <option th:each="profile : ${roles}" th:value="${profile.id}" th:text="${profile.type}"></option>
+            <div th:if="${#fields.hasErrors('userProfiles')}" class="error-message">
+                <span th:errors="*{userProfiles}">Role error</span>
+            </div>
+        </select>
+
+        <button type="submit">Salva Utente</button>
+    </form>
+</div>
+</body>
+</html>
