@@ -42,10 +42,9 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
     @Autowired
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/").hasAnyRole( "CUSTOMER","ADMIN")
-                                .requestMatchers("/newuser/**", "/delete-user-*").hasRole("ADMIN")
-                                .requestMatchers("/edit-user-*").hasRole("ADMIN")
-                                .requestMatchers("/profile/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        authorize.requestMatchers("/","homepage").hasAnyRole( "CUSTOMER","ADMIN")
+                                .requestMatchers("/newuser/**", "/delete-user/**","/edit-user/**").hasRole("ADMIN")
+                                .requestMatchers("/reservation/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
 
                 .formLogin(form -> form.loginPage("/login")

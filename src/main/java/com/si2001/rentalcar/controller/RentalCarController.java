@@ -5,6 +5,7 @@ import com.si2001.rentalcar.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,7 +45,7 @@ public class RentalCarController {
         this.authenticationTrustResolver = authenticationTrustResolver;
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    @GetMapping(value = "/login")
     public String loginPage() {
         if (isCurrentAuthenticationAnonymous()) {
             return "login";
@@ -51,7 +54,7 @@ public class RentalCarController {
         }
     }
 
-    @RequestMapping(value = {"/","/homepage"}, method = RequestMethod.GET)
+    @GetMapping(value = {"/","/homepage"})
     public String homepage(ModelMap model) {
         List<User> customers = userService.getAllUsers();
         model.addAttribute("customers", customers);
@@ -72,27 +75,57 @@ public class RentalCarController {
         if (result.hasErrors()) {
             return "registration";
         }
-        /*if (!userService.isUsernameUnique(user.getId(), user.getUsername())) {
+        if (!userService.isUsernameUnique(user.getId(), user.getUsername())) {
             FieldError ssoError = new FieldError("user", "username",
                     messageSource.getMessage("non.unique.username", new String[]{user.getUsername()}, Locale.getDefault()));
             result.addError(ssoError);
             return "registration";
-        }*/
+        }
         userService.saveUser(user);
         return "redirect:/homepage";
     }
 
-    @GetMapping("/delete-user/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
-        userService.deleteUserById(id);
-        return "redirect:/users";
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleIllegalArgumentException(IllegalArgumentException ex, ModelMap model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "registration"; // Return to the registration form with error
     }
 
-    @RequestMapping(value = {"/cars"}, method = RequestMethod.GET)
-    public String viewCars(ModelMap model) {
+    @GetMapping(value = "/reservations")
+    public String reservationForm(@RequestParam(value = "userId", required = false) Integer userId,ModelMap model) {
         model.addAttribute("cars", carService.getAllCars());
-        model.addAttribute("loggedinuser", getPrincipal());
-        return "cars";
+        List<Reservation> reservations;
+
+        if (userId != null) {
+            User user = userService.getById(userId);
+            reservations = reservationService.getReservationsByUsername(user.getUsername());
+        } else {
+            reservations = reservationService.getAllReservations();
+        }
+
+        model.addAttribute("reservations", reservations);
+        model.addAttribute("users", userService.getAllUsers()); // Per il filtro utenti
+        return "reservations";
+    }
+
+    @PostMapping("/reservations")
+    public String saveNewReservation(@RequestParam("carId") int carId,
+                                    @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                    @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        String username = getPrincipal();
+        User user = userService.getByUsername(username);
+        Car car = carService.getCarById(carId);
+
+        Reservation reservation = new Reservation();
+        reservation.setUser(user);
+        reservation.setCar(car);
+        reservation.setStartDate(startDate);
+        reservation.setEndDate(endDate);
+        reservation.setStatus("in approvazione"); // Status iniziale
+
+        reservationService.saveReservation(reservation);
+
+        return "redirect:/homepage";
     }
 
     @PostMapping("/approve-reservation/{id}")
@@ -107,19 +140,17 @@ public class RentalCarController {
         return "redirect:/homepage";
     }
 
-    @RequestMapping(value = "/reservations", method = RequestMethod.GET)
-    public String reservationList(ModelMap model) {
-        model.addAttribute("activePage", "reservations");
-        model.addAttribute("users", userProfileService.getAllUserProfiles());
-        model.addAttribute("reservations", reservationService.getAllReservations());
-        return "reservations";
+    @GetMapping("/delete-user/{id}")
+    public String deleteUser(@PathVariable("id") int id) {
+        userService.deleteUserById(id);
+        return "redirect:/users";
     }
 
-    @GetMapping("/userslist")
-    public String listUsers(ModelMap model) {
-        List<User> users = userService.getAllUsers();
-        model.addAttribute("users", users);
-        return "users";
+    @GetMapping(value = {"/cars"})
+    public String viewCars(ModelMap model) {
+        model.addAttribute("cars", carService.getAllCars());
+        model.addAttribute("loggedinuser", getPrincipal());
+        return "cars";
     }
 
     @RequestMapping(value = "/accessDenied", method = RequestMethod.GET)

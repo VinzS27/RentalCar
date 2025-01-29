@@ -3,6 +3,7 @@ package com.si2001.rentalcar.model;
 import jakarta.persistence.*;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,6 +23,13 @@ public class User {
     @NotEmpty
     private String password;
 
+    @Column(name = "email", unique=true, nullable = false)
+    @NotEmpty
+    private String email;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<Reservation> reservation;
+
     @NotEmpty
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_profile_joinTable",
@@ -31,10 +39,13 @@ public class User {
 
     public User() {}
 
-    public User(int id, String username, String password, String role) {
+    public User(int id, String username, String password, String email, List<Reservation> reservation, Set<UserProfile> userProfiles) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.email = email;
+        this.reservation = reservation;
+        this.userProfiles = userProfiles;
     }
 
     public int getId() {
@@ -69,12 +80,31 @@ public class User {
         this.userProfiles = userProfiles;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public List<Reservation> getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(List<Reservation> reservation) {
+        this.reservation = reservation;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", reservation=" + reservation +
+                ", userProfiles=" + userProfiles +
                 '}';
     }
 
@@ -82,11 +112,11 @@ public class User {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(userProfiles, user.userProfiles);
+        return id == user.id && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(reservation, user.reservation) && Objects.equals(userProfiles, user.userProfiles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, password, userProfiles);
+        return Objects.hash(id, username, password, email, reservation, userProfiles);
     }
 }

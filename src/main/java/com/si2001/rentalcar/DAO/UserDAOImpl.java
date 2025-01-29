@@ -1,6 +1,9 @@
 package com.si2001.rentalcar.DAO;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.si2001.rentalcar.model.User;
@@ -8,7 +11,7 @@ import com.si2001.rentalcar.model.User;
 @Repository("UserDao")
 public class UserDAOImpl extends AbstractDao<Integer, User> implements UserDAO {
 
-	public User getUserById(int id) {
+    public User getUserById(int id) {
 		return getByKey(id);
 	}
 

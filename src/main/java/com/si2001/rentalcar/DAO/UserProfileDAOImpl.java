@@ -19,9 +19,13 @@ public class UserProfileDAOImpl extends AbstractDao<Integer, UserProfile> implem
     }
 
     public UserProfile getUserProfileByType(String type) {
-        return (UserProfile) getEntityManager()
-                .createQuery("SELECT e FROM UserProfile e WHERE e.type LIKE :type")
-                .setParameter("type", type)
-                .getSingleResult();
+        String normalizedType = type.trim().toLowerCase();
+        System.out.println("Searching for UserProfile with type: " + normalizedType); // Debug log
+        List<UserProfile> profiles = getEntityManager()
+                .createQuery("SELECT u FROM UserProfile u WHERE u.type = :type", UserProfile.class)
+                .setParameter("type", normalizedType)
+                .getResultList();
+
+        return profiles.get(0); // Return the first result (assuming type is unique).
     }
 }

@@ -10,9 +10,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -64,6 +67,25 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         return viewResolver;
     }
 
+    @Override
+    public void addFormatters(FormatterRegistry registry)
+    {
+        registry.addConverter(reservationConverter);
+        registry.addConverter(roleToUserProfileConverter);
+        registry.addConverter(carConverter);
+    }
+
+    @Bean(name="multipartResolver")
+    public StandardServletMultipartResolver resolver()
+    {
+        return new StandardServletMultipartResolver();
+    }
+
+    @Bean
+    public SpringSecurityDialect securityDialect() {
+        return new SpringSecurityDialect();
+    }
+
     @Bean
     @Description("Spring Message Resolver")
     public ResourceBundleMessageSource messageSource() {
@@ -71,5 +93,4 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         messageSource.setBasename("messages");
         return messageSource;
     }
-
 }

@@ -2,6 +2,8 @@ package com.si2001.rentalcar.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "car")
 public class Car {
@@ -18,12 +20,15 @@ public class Car {
     @Column(name = "year", nullable = false)
     private int year;
 
+    @Column(name = "license_plate", nullable = false)
+    private String licensePlate;
+
     @Column(name = "availability", nullable = false)
-    private String availability;
+    private boolean availability;
 
     public Car() {}
 
-    public Car(int id, String model, String brand, int year, String availability) {
+    public Car(int id, String model, String brand, int year, boolean availability) {
         this.id = id;
         this.model = model;
         this.brand = brand;
@@ -63,11 +68,43 @@ public class Car {
         this.year = year;
     }
 
-    public String getAvailability() {
+    public boolean getAvailability() {
         return availability;
     }
 
-    public void setAvailability(String availability) {
+    public void setAvailability(boolean availability) {
         this.availability = availability;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "id=" + id +
+                ", model='" + model + '\'' +
+                ", brand='" + brand + '\'' +
+                ", year=" + year +
+                ", licensePlate='" + licensePlate + '\'' +
+                ", availability='" + availability + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return id == car.id && year == car.year && Objects.equals(model, car.model) && Objects.equals(brand, car.brand) && Objects.equals(licensePlate, car.licensePlate) && Objects.equals(availability, car.availability);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, model, brand, year, licensePlate, availability);
     }
 }

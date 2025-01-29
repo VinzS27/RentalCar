@@ -1,40 +1,95 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" lang="">
 <head>
-    <title>Elenco Prenotazioni</title>
+    <title>Gestione Prenotazioni</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .container { max-width: 900px; margin: 2rem auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        button { padding: 5px 10px; cursor: pointer; }
+        .approve { background-color: green; color: white; }
+        .decline { background-color: red; color: white; }
+    </style>
 </head>
 <body>
-<!-- Header -->
-<div th:replace="fragments/header :: header"></div>
+<header>
+    <div th:replace="fragments/header :: header"></div>
+</header>
+<div class="container">
 
-<h1>Elenco Prenotazioni</h1>
+    <!-- Sezione CUSTOMER -->
+    <div sec:authorize="hasRole('CUSTOMER')">
+        <h2>Effettua una Nuova Prenotazione</h2>
+        <form th:action="@{/reservations}" method="post">
+            <label for="car">Scegli un'auto:</label>
+            <select id="car" name="carId" required>
+                <option th:each="car : ${cars}" th:value="${car.id}"
+                        th:text="|${car.brand} ${car.model} (${car.year}) - ${car.availability ? 'Disponibile' : 'Non disponibile'}|"
+                        th:disabled="!${car.availability}"></option>
+            </select>
 
-<table border="1">
-    <thead>
-    <tr>
-        <th>Utente</th>
-        <th>Modello Auto</th>
-        <th>Data Inizio</th>
-        <th>Data Fine</th>
-        <th>Stato</th>
-        <th>Azioni</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="reservation : ${reservations}">
-        <td th:text="${reservation.user.username}"></td>
-        <td th:text="${reservation.auto.model}"></td>
-        <td th:text="${reservation.startDate}"></td>
-        <td th:text="${reservation.endDate}"></td>
-        <td th:text="${reservation.status}"></td>
-        <td>
-            <a th:href="@{/approve-reservation/{id}(id=${reservation.id})}">Approva</a>
-            <a th:href="@{/decline-reservation/{id}(id=${reservation.id})}">Declina</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+            <label for="startDate">Data Inizio:</label>
+            <input type="date" id="startDate" name="startDate" required>
 
+            <label for="endDate">Data Fine:</label>
+            <input type="date" id="endDate" name="endDate" required>
+
+            <button type="submit">Prenota</button>
+        </form>
+    </div>
+
+    <!-- Sezione ADMIN -->
+    <div sec:authorize="hasRole('ADMIN')">
+        <h2>Gestione Prenotazioni</h2>
+
+        <!-- Filtro per utente -->
+        <form th:action="@{/reservations}" method="get">
+            <label for="userFilter">Filtra per utente:</label>
+            <select id="userFilter" name="userId">
+                <option value="">Tutti</option>
+                <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username}"></option>
+            </select>
+            <button type="submit">Filtra</button>
+        </form>
+
+        <!-- Tabella delle prenotazioni -->
+        <table>
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>Auto</th>
+                <th>Data Inizio</th>
+                <th>Data Fine</th>
+                <th>Status</th>
+                <th>Azione</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="reservation : ${reservations}">
+                <td th:text="${reservation.user.username}"></td>
+                <td th:text="|${reservation.car.brand} ${reservation.car.model}|"></td>
+                <td th:text="${reservation.startDate}"></td>
+                <td th:text="${reservation.endDate}"></td>
+                <td th:text="${reservation.status}"></td>
+                <td>
+                    <form th:action="@{/approve-reservation}" method="post" style="display:inline;">
+                        <input type="hidden" name="reservationId" th:value="${reservation.id}">
+                        <button type="submit" class="approve" th:disabled="${reservation.status == 'approvato'}">Approva</button>
+                    </form>
+                    <form th:action="@{/decline-reservation}" method="post" style="display:inline;">
+                        <input type="hidden" name="reservationId" th:value="${reservation.id}">
+                        <button type="submit" class="decline" th:disabled="${reservation.status == 'non approvato'}">Declina</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
 </body>
 </html>
 

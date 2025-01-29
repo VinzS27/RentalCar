@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" lang="">
 <head>
     <title>Homepage</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
@@ -89,16 +90,16 @@
             <thead>
             <tr>
                 <th>Username</th>
-                <th>Ruolo</th>
+                <th>Email</th>
                 <th>Azioni</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user : ${userList}">
+            <tr th:each="user : ${customers}">
                 <td th:text="${user.username}">Username</td>
-                <td th:text="${user.role}">Ruolo</td>
+                <td th:text="${user.email}">Email</td>
                 <td class="actions">
-                    <a th:href="@{/view-user/{id}(id=${user.id})}">Visualizza</a>
+                    <a th:href="@{/reservations}">Visualizza</a>
                     <a th:href="@{/edit-user/{id}(id=${user.id})}">Modifica</a>
                     <a th:href="@{/delete-user/{id}(id=${user.id})}"
                        onclick="return confirm('Sei sicuro di voler cancellare questo utente?');">Cancella</a>
@@ -111,21 +112,27 @@
     <!-- Area CUSTOMER -->
     <div sec:authorize="hasRole('CUSTOMER')">
         <h2>Le Tue Prenotazioni</h2>
-        <a href="#" class="btn">Aggiungi Prenotazione</a>
+        <a th:href="@{/reservations}" class="btn">Aggiungi Prenotazione</a>
         <table class="table">
             <thead>
             <tr>
-                <th>Auto</th>
+                <th>Brand</th>
+                <th>Modello</th>
+                <th>Targa</th>
                 <th>Data Inizio</th>
                 <th>Data Fine</th>
+                <th>Stato</th>
                 <th>Azioni</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="reservation : ${reservationList}">
+                <td th:text="${reservation.car.brand}">Brand</td>
+                <td th:text="${reservation.car.model}">Modello</td>
+                <td th:text="${reservation.car.licensePlate}">Targa</td>
                 <td th:text="${reservation.startDate}">Data Inizio</td>
                 <td th:text="${reservation.endDate}">Data Fine</td>
-                <td th:text="${reservation.car}">Auto</td>
+                <td th:text="${reservation.status}">Data Fine</td>
                 <td class="actions">
                     <a th:if="${#dates.daysBetween(#dates.createNow(), reservation.startDate) > 2}"
                        th:href="@{/reservation/edit/{id}(id=${reservation.id})}">Modifica</a>
@@ -137,8 +144,6 @@
             </tbody>
         </table>
     </div>
-
 </div>
-
 </body>
 </html>

@@ -9,17 +9,16 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class RoleToUserProfileConverter implements Converter<Object, UserProfile>{
+public class RoleToUserProfileConverter implements Converter<Object, UserProfile> {
 
-    static final Logger logger = LoggerFactory.getLogger(RoleToUserProfileConverter.class);
+    final UserProfileService userProfileService;
 
-    UserProfileService userProfileService;
+    public RoleToUserProfileConverter(UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
+    }
 
     public UserProfile convert(Object element) {
-        Integer id = Integer.parseInt((String)element);
-        UserProfile profile= userProfileService.getUserProfileById(id);
-        logger.info("Profile : {}",profile);
-        return profile;
+        return userProfileService.getUserProfileByType((String) element);
     }
 
 }
