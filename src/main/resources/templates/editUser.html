@@ -9,8 +9,8 @@
     <div th:replace="fragments/header :: header"></div>
 </header>
 <div class="form-container">
-    <h2>Aggiungi Nuovo Utente</h2>
-    <form th:action="@{/registration}" th:object="${user}" method="post">
+    <h2>Modifica Utente</h2>
+    <form th:action="@{/editUser}" th:object="${user}" method="post">
         <label for="username">Username:<span class="required">*</span></label>
         <input type="text" id="username" th:field="*{username}" required/>
         <div th:if="${#fields.hasErrors('username')}" class="error-message">
@@ -31,14 +31,14 @@
 
         <label for="userProfiles">Ruolo:<span class="required">*</span></label>
         <!--<select id="userProfiles" th:field="*{userProfiles}" required>-->
-            <input type="text" id="userProfiles" th:field="*{userProfiles}" required/>
-            <!--<option th:each="profile : ${roles}" th:value="${profile.type}" th:text="${profile.type}"></option>-->
-            <!--<div th:if="${#fields.hasErrors('userProfiles')}" class="error-message">
-                <span th:errors="*{userProfiles}">Role error</span>
-            </div>
-        </select>-->
+        <input type="text" id="userProfiles" th:field="*{userProfiles}" required/>
+        <!--<option th:each="profile : ${roles}" th:value="${profile.type}" th:text="${profile.type}"></option>
+        <div th:if="${#fields.hasErrors('userProfiles')}" class="error-message">
+            <span th:errors="*{userProfiles}">Role error</span>
+        </div>
+    </select>-->
 
-        <button type="submit">Salva Utente</button>
+        <button type="submit">Salva Modifiche</button>
     </form>
 </div>
 </body>

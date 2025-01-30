@@ -17,7 +17,7 @@ public class UserDAOImpl extends AbstractDao<Integer, User> implements UserDAO {
 
 	public User getUserByUsername(String username) {
         return (User) getEntityManager()
-                .createQuery("SELECT u FROM User u WHERE u.username LIKE :username")
+                .createQuery("SELECT u FROM User u WHERE u.username = :username")
                 .setParameter("username", username)
                 .getSingleResult();
 	}
@@ -35,8 +35,12 @@ public class UserDAOImpl extends AbstractDao<Integer, User> implements UserDAO {
 				.getResultList();
 	}
 
+	public void updateUser(User u) {
+		update(u);
+	}
+
 	public void saveUser(User user) {
-		this.persist(user);
+		persist(user);
 	}
 
 	public void deleteUserById(int id) {

@@ -33,11 +33,11 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
         this.tokenRepository = tokenRepository;
     }
 
-    @Autowired
-    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        //auth.userDetailsService(userDetailsService);
-        auth.authenticationProvider(authenticationProvider());
-    }
+//    @Autowired
+//    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
+//        //auth.userDetailsService(userDetailsService);
+//        //auth.authenticationProvider(authenticationProvider());
+//    }
 
     @Autowired
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -46,6 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
                                 .requestMatchers("/newuser/**", "/delete-user/**","/edit-user/**").hasRole("ADMIN")
                                 .requestMatchers("/reservation/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
+                .userDetailsService(userDetailsService)
 
                 .formLogin(form -> form.loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -72,13 +73,6 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
-    }
 
     @Bean
     public PersistentTokenBasedRememberMeServices getPersistentTokenBasedRememberMeServices() {

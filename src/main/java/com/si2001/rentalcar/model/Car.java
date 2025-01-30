@@ -23,16 +23,25 @@ public class Car {
     @Column(name = "license_plate", nullable = false)
     private String licensePlate;
 
-    @Column(name = "availability", nullable = false)
+    @Column(name = "availability", nullable = false,columnDefinition = "boolean default false")
     private boolean availability;
 
     public Car() {}
 
-    public Car(int id, String model, String brand, int year, boolean availability) {
+    public Car(int id, String model, String brand, int year, String licensePlate, boolean availability) {
         this.id = id;
         this.model = model;
         this.brand = brand;
         this.year = year;
+        this.licensePlate = licensePlate;
+        this.availability = availability;
+    }
+
+    public Car(String model, String brand, int year, String licensePlate, boolean availability) {
+        this.model = model;
+        this.brand = brand;
+        this.year = year;
+        this.licensePlate = licensePlate;
         this.availability = availability;
     }
 

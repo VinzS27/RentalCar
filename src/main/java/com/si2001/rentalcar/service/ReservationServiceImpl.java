@@ -49,13 +49,13 @@ public class ReservationServiceImpl implements ReservationService {
 
     public void approveReservation(int id) {
         Reservation reservation = dao.getReservationById(id);
-        reservation.setStatus("APPROVED");
+        reservation.setStatus("approvato");
         dao.saveReservation(reservation);
     }
 
     public void declineReservation(int id) {
         Reservation reservation = dao.getReservationById(id);
-        reservation.setStatus("DECLINED");
+        reservation.setStatus("non approvato");
         dao.saveReservation(reservation);
     }
 }

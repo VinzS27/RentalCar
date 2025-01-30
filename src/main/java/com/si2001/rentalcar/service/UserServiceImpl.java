@@ -43,9 +43,11 @@ public class UserServiceImpl implements UserService {
         if (u != null) {
 			u.setUsername(user.getUsername());
 			u.setPassword(user.getPassword());
+            u.setEmail(user.getEmail());
             if (user.getUserProfiles() != null) {
                 u.setUserProfiles(user.getUserProfiles());
             }
+            dao.updateUser(u);
         }
     }
 

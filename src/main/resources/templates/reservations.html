@@ -4,42 +4,13 @@
 <head>
     <title>Gestione Prenotazioni</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <style>
-        .container { max-width: 900px; margin: 2rem auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        th { background-color: #007bff; color: white; }
-        button { padding: 5px 10px; cursor: pointer; }
-        .approve { background-color: green; color: white; }
-        .decline { background-color: red; color: white; }
-    </style>
 </head>
 <body>
 <header>
+    <h1>Elenco Prenotazioni</h1>
     <div th:replace="fragments/header :: header"></div>
 </header>
 <div class="container">
-
-    <!-- Sezione CUSTOMER -->
-    <div sec:authorize="hasRole('CUSTOMER')">
-        <h2>Effettua una Nuova Prenotazione</h2>
-        <form th:action="@{/reservations}" method="post">
-            <label for="car">Scegli un'auto:</label>
-            <select id="car" name="carId" required>
-                <option th:each="car : ${cars}" th:value="${car.id}"
-                        th:text="|${car.brand} ${car.model} (${car.year}) - ${car.availability ? 'Disponibile' : 'Non disponibile'}|"
-                        th:disabled="!${car.availability}"></option>
-            </select>
-
-            <label for="startDate">Data Inizio:</label>
-            <input type="date" id="startDate" name="startDate" required>
-
-            <label for="endDate">Data Fine:</label>
-            <input type="date" id="endDate" name="endDate" required>
-
-            <button type="submit">Prenota</button>
-        </form>
-    </div>
 
     <!-- Sezione ADMIN -->
     <div sec:authorize="hasRole('ADMIN')">
@@ -87,6 +58,26 @@
             </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Sezione CUSTOMER -->
+    <div sec:authorize="hasRole('CUSTOMER')">
+        <h2>Effettua una Nuova Prenotazione</h2>
+        <form th:action="@{/reservations}" method="post">
+            <label for="car">Scegli un'auto:</label>
+            <select id="car" name="carId" required>
+                <option th:each="car : ${cars}" th:value="${car.id}"
+                        th:text="|${car.brand} ${car.model} (${car.year}) - ${car.availability ? 'Disponibile' : 'Non disponibile'}|"
+                        th:disabled="!${car.availability}"></option>
+            </select>
+
+            <label for="startDate">Data Inizio:</label>
+            <input type="date" id="startDate" name="startDate" required>
+            <label for="endDate">Data Fine:</label>
+            <input type="date" id="endDate" name="endDate" required>
+
+            <button type="submit">Prenota</button>
+        </form>
     </div>
 
 </div>

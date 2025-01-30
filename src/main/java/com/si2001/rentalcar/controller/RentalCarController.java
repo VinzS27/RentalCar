@@ -59,7 +59,8 @@ public class RentalCarController {
         List<User> customers = userService.getAllUsers();
         model.addAttribute("customers", customers);
         List<Reservation> reservationList = reservationService.getAllReservations();
-        model.addAttribute("reservationList", reservationList);
+        model.addAttribute("reservations", reservationList);
+        model.addAttribute("cars", carService.getAllCars());
         return "homepage";
     }
 
@@ -75,12 +76,12 @@ public class RentalCarController {
         if (result.hasErrors()) {
             return "registration";
         }
-        if (!userService.isUsernameUnique(user.getId(), user.getUsername())) {
+        /*if (!userService.isUsernameUnique(user.getId(), user.getUsername())) {
             FieldError ssoError = new FieldError("user", "username",
                     messageSource.getMessage("non.unique.username", new String[]{user.getUsername()}, Locale.getDefault()));
             result.addError(ssoError);
             return "registration";
-        }
+        }*/
         userService.saveUser(user);
         return "redirect:/homepage";
     }
@@ -104,7 +105,7 @@ public class RentalCarController {
         }
 
         model.addAttribute("reservations", reservations);
-        model.addAttribute("users", userService.getAllUsers()); // Per il filtro utenti
+        model.addAttribute("users", userService.getAllUsers());
         return "reservations";
     }
 
@@ -128,29 +129,64 @@ public class RentalCarController {
         return "redirect:/homepage";
     }
 
-    @PostMapping("/approve-reservation/{id}")
-    public String approveReservation(@PathVariable int id) {
+    @PostMapping("/approve-reservation")
+    public String approveReservation(@RequestParam("reservationId")int id) {
         reservationService.approveReservation(id);
         return "redirect:/homepage";
     }
 
-    @PostMapping("/decline-reservation/{id}")
-    public String declineReservation(@PathVariable int id) {
+    @PostMapping("/decline-reservation")
+    public String declineReservation(@RequestParam("reservationId") int id) {
         reservationService.declineReservation(id);
         return "redirect:/homepage";
     }
 
-    @GetMapping("/delete-user/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
+    @GetMapping("/editUser/{id}")
+    public String editUserForm(@PathVariable("id") int id, ModelMap model) {
+        User user = userService.getById(id);
+        model.addAttribute("user", user);
+        model.addAttribute("roles", userProfileService.getAllUserProfiles());
+        return "editUser";
+    }
+
+    @PostMapping("/editUser")
+    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult result, ModelMap model) {
+        if (result.hasErrors()) {
+            return "editUser";
+        }
+
+        userService.updateUser(user);
+        return "redirect:/homepage";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable int id, ModelMap model) {
         userService.deleteUserById(id);
-        return "redirect:/users";
+        model.addAttribute("users", getUsers());
+        return "homepage";
     }
 
     @GetMapping(value = {"/cars"})
     public String viewCars(ModelMap model) {
         model.addAttribute("cars", carService.getAllCars());
-        model.addAttribute("loggedinuser", getPrincipal());
         return "cars";
+    }
+
+    @PostMapping("/add-car")
+    public String addCar(@RequestParam String brand,
+                         @RequestParam String model,
+                         @RequestParam int year,
+                         @RequestParam String licensePlate,
+                         @RequestParam boolean available) {
+        Car car = new Car(model, brand, year, licensePlate , available);
+        carService.saveCar(car);
+        return "redirect:/cars";
+    }
+
+    @GetMapping("/delete-car/{id}")
+    public String deleteCar(@PathVariable int id) {
+        carService.deleteCarById(id);
+        return "redirect:/cars";
     }
 
     @RequestMapping(value = "/accessDenied", method = RequestMethod.GET)

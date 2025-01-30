@@ -11,7 +11,7 @@
             <li><a th:href="@{/homepage}">Homepage</a></li>
             <li><a th:href="@{/cars}">Parco Auto</a></li>
             <li><a th:href="@{/profile}">Profilo Utente</a></li>
-            <li sec:authorize="hasRole('ADMIN')">
+            <li sec:authorize="hasAuthority('ROLE_ADMIN')">
                 <a th:href="@{/reservations}">Elenco Prenotazioni</a>
             </li>
         </ul>
