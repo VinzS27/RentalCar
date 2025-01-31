@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" lang="">
 <head>
     <title>Gestione Prenotazioni</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/static/style.css}"/>
 </head>
 <body>
 <header>
@@ -11,7 +11,6 @@
     <div th:replace="fragments/header :: header"></div>
 </header>
 <div class="container">
-
     <!-- Sezione ADMIN -->
     <div sec:authorize="hasRole('ADMIN')">
         <h2>Gestione Prenotazioni</h2>
@@ -62,21 +61,29 @@
 
     <!-- Sezione CUSTOMER -->
     <div sec:authorize="hasRole('CUSTOMER')">
-        <h2>Effettua una Nuova Prenotazione</h2>
-        <form th:action="@{/reservations}" method="post">
+        <h2 th:text="${mode == 'edit'} ? 'Modifica Prenotazione' : 'Nuova Prenotazione'"></h2>
+        <form th:action="@{/saveReservations}" method="post">
+
+            <input type="hidden" th:name="reservationId" th:value="${mode == 'edit' ? reservation.id : 0}">
+
             <label for="car">Scegli un'auto:</label>
             <select id="car" name="carId" required>
                 <option th:each="car : ${cars}" th:value="${car.id}"
                         th:text="|${car.brand} ${car.model} (${car.year}) - ${car.availability ? 'Disponibile' : 'Non disponibile'}|"
+                        th:selected="${mode == 'edit' && reservation.car.id == car.id}"
                         th:disabled="!${car.availability}"></option>
             </select>
+            <input type="hidden" th:if="${mode == 'edit'}" name="carId" th:value="${reservation.car.id}">
 
             <label for="startDate">Data Inizio:</label>
-            <input type="date" id="startDate" name="startDate" required>
-            <label for="endDate">Data Fine:</label>
-            <input type="date" id="endDate" name="endDate" required>
+            <input type="date" id="startDate" name="startDate"
+                   th:value="${mode == 'edit' ? reservation.startDate : ''}" required>
 
-            <button type="submit">Prenota</button>
+            <label for="endDate">Data Fine:</label>
+            <input type="date" id="endDate" name="endDate"
+                   th:value="${mode == 'edit' ? reservation.endDate : ''}" required>
+
+            <button type="submit" th:text="${mode == 'edit'} ? 'Salva Modifiche' : 'Prenota'"></button>
         </form>
     </div>
 

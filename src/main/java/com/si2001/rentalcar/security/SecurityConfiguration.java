@@ -33,18 +33,11 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
         this.tokenRepository = tokenRepository;
     }
 
-//    @Autowired
-//    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-//        //auth.userDetailsService(userDetailsService);
-//        //auth.authenticationProvider(authenticationProvider());
-//    }
-
     @Autowired
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/","homepage").hasAnyRole( "CUSTOMER","ADMIN")
-                                .requestMatchers("/newuser/**", "/delete-user/**","/edit-user/**").hasRole("ADMIN")
-                                .requestMatchers("/reservation/**").hasRole("ADMIN")
+                        authorize.requestMatchers("/","homepage", "/reservations/**").hasAnyRole( "CUSTOMER","ADMIN")
+                                .requestMatchers("/registration/**", "/deleteUser/**","/editUser/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
 

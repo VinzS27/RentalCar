@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" lang="">
 <head>
     <title>Homepage</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/static/style.css}"/>
 </head>
 <body>
 <header>
@@ -12,7 +12,6 @@
 </header>
 
 <div class="container">
-
     <!-- Area ADMIN -->
     <div sec:authorize="hasRole('ADMIN')">
         <h2>Gestione Utenti</h2>
@@ -32,7 +31,7 @@
                 <td class="actions">
                     <a th:href="@{/reservations}">Visualizza</a>
                     <a th:href="@{/editUser/{id}(id=${user.id})}">Modifica</a>
-                    <a th:href="@{/delete/{id}(id=${user.id})}"
+                    <a th:href="@{/deleteUser/{id}(id=${user.id})}"
                        onclick="return confirm('Sei sicuro di voler cancellare questo utente?');">Cancella</a>
                 </td>
             </tr>
@@ -63,10 +62,11 @@
                 <td th:text="${reservation.endDate}"></td>
                 <td th:text="${reservation.status}"></td>
                 <td class="actions">
-                    <a th:if="${#dates.daysBetween(#dates.createNow(), reservation.startDate) > 2}"
-                       th:href="@{/editReservation/{id}(id=${reservation.id})}">Modifica</a>
-                    <a th:if="${#dates.daysBetween(#dates.createNow(), reservation.startDate) > 2}"
-                       th:href="@{/deleteReservation/{id}(id=${reservation.id})}"
+                    <a th:if="${reservation.startDate.isBefore(T(java.time.LocalDate).now().minusDays(2))}"
+                       th:href="@{/editReservations/{id}(id=${reservation.id})}">Modifica</a>
+
+                    <a th:if="${reservation.startDate.isBefore(T(java.time.LocalDate).now().minusDays(2))}"
+                       th:href="@{/deleteReservations/{id}(id=${reservation.id})}"
                        onclick="return confirm('Cancellare questa prenotazione?');">Cancella</a>
                 </td>
             </tr>

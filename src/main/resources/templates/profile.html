@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Profilo Utente</title>
+    <link rel="stylesheet" th:href="@{/static/style.css}"/>
+</head>
+<body>
+<header>
+    <h1>I miei dati</h1>
+    <div th:replace="fragments/header :: header"></div>
+</header>
+<div class="container">
+    <h2>Dati Utente</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.getUsername()}">Username</td>
+            <td th:text="${user.getEmail()}">Email</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

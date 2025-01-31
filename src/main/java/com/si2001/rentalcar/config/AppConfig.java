@@ -50,10 +50,10 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         return templateResolver;
     }
 
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        registry.addResourceHandler("/static/**").addResourceLocations("/static/");
-//    }
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry){
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+    }
 
     @Bean
     public SpringTemplateEngine templateEngine() {
