@@ -16,22 +16,18 @@ public class UserDAOImpl extends AbstractDao<Integer, User> implements UserDAO {
 	}
 
 	public User getUserByUsername(String username) {
-        return (User) getEntityManager()
-                .createQuery("SELECT u FROM User u WHERE u.username = :username")
-                .setParameter("username", username)
-                .getSingleResult();
+		List<User> users = getEntityManager()
+				.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
+				.setParameter("username", username)
+				.getResultList();
+
+		return (users.isEmpty()) ? null : users.get(0);
 	}
+
 
 	public List<User> getAllUsers() {
 		return getEntityManager()
 				.createQuery("SELECT u FROM User u", User.class)
-				.getResultList();
-	}
-
-	public List<User> getAllUserByUsername(String username) {
-		return getEntityManager()
-				.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
-				.setParameter("username", username)
 				.getResultList();
 	}
 

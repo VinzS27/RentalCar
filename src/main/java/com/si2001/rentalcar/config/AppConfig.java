@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -35,7 +34,7 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) {
     }
 
-    public AppConfig(RoleToUserProfileConverter roleToUserProfileConverter, CarConverter carConverter, RoleToUserProfileConverter roleConverter, ReservationConverter reservationConverter) {
+    public AppConfig(RoleToUserProfileConverter roleToUserProfileConverter, CarConverter carConverter, ReservationConverter reservationConverter) {
         this.roleToUserProfileConverter = roleToUserProfileConverter;
         this.carConverter = carConverter;
         this.reservationConverter = reservationConverter;
@@ -51,7 +50,7 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
     }
 
     @Override
-    public void addResourceHandlers(final ResourceHandlerRegistry registry){
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     }
 
@@ -74,17 +73,10 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
     }
 
     @Override
-    public void addFormatters(FormatterRegistry registry)
-    {
+    public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(reservationConverter);
         registry.addConverter(roleToUserProfileConverter);
         registry.addConverter(carConverter);
-    }
-
-    @Bean(name="multipartResolver")
-    public StandardServletMultipartResolver resolver()
-    {
-        return new StandardServletMultipartResolver();
     }
 
     @Bean

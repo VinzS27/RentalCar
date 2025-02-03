@@ -12,7 +12,7 @@
 </header>
 <div class="container">
     <h2>Lista Auto</h2>
-    <a th:href="@{/addCar}" class="btn">Aggiungi Auto</a>
+    <a th:href="@{/addCar}" class="btn" sec:authorize="hasRole('ADMIN')">Aggiungi Auto</a>
     <table class="table">
         <thead>
         <tr>

@@ -39,7 +39,6 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
                         authorize.requestMatchers("/","homepage", "/reservations/**").hasAnyRole( "CUSTOMER","ADMIN")
                                 .requestMatchers("/registration/**", "/deleteUser/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
-                .userDetailsService(userDetailsService)
 
                 .formLogin(form -> form.loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -50,6 +49,7 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
 
                 .rememberMe(remember -> remember.rememberMeParameter("remember-me")
                         .tokenRepository(tokenRepository)
+                        .userDetailsService(userDetailsService)
                         .tokenValiditySeconds(86400)) // 24h
 
                 .exceptionHandling(exception ->

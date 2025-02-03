@@ -23,7 +23,6 @@ import java.util.Set;
 
 @Controller
 public class RentalCarController {
-
     final UserService userService;
     final UserProfileService userProfileService;
     final CarService carService;
@@ -205,19 +204,19 @@ public class RentalCarController {
         return "cars";
     }
 
-    @GetMapping(value = { "/addCar"})
+    @GetMapping(value = {"/addCar"})
     public String addCarForm() {
         return "addCar";
     }
 
     @PostMapping("/saveCar")
-    public String addCar(@RequestParam ("carId")int carId,
-                         @RequestParam ("brand")String brand,
-                         @RequestParam ("model")String model,
-                         @RequestParam ("year")int year,
-                         @RequestParam ("licensePlate")String licensePlate,
-                         @RequestParam ("available")boolean available) {
-        if(carId!=0){
+    public String addCar(@RequestParam("carId") int carId,
+                         @RequestParam("brand") String brand,
+                         @RequestParam("model") String model,
+                         @RequestParam("year") int year,
+                         @RequestParam("licensePlate") String licensePlate,
+                         @RequestParam("available") boolean available) {
+        if (carId != 0) {
             Car car = carService.getCarById(carId);
             car.setBrand(brand);
             car.setModel(model);
@@ -225,7 +224,7 @@ public class RentalCarController {
             car.setLicensePlate(licensePlate);
             car.setAvailability(available);
             carService.updateCar(car);
-        }else{
+        } else {
             Car car = new Car(model, brand, year, licensePlate, available);
             carService.saveCar(car);
         }
