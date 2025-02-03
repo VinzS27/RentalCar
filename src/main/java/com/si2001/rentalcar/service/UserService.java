@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.si2001.rentalcar.model.User;
 
-
 public interface UserService {
 
 	User getById(int id);

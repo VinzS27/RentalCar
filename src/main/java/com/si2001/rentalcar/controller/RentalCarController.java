@@ -2,7 +2,8 @@ package com.si2001.rentalcar.controller;
 
 import com.si2001.rentalcar.model.*;
 import com.si2001.rentalcar.service.*;
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,22 +11,15 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Controller
 public class RentalCarController {
@@ -37,9 +31,10 @@ public class RentalCarController {
     final MessageSource messageSource;
     final PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices;
     final AuthenticationTrustResolver authenticationTrustResolver;
+    final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public RentalCarController(UserService userService, UserProfileService userProfileService, CarService carService, ReservationService reservationService, MessageSource messageSource, PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices, AuthenticationTrustResolver authenticationTrustResolver) {
+    public RentalCarController(UserService userService, UserProfileService userProfileService, CarService carService, ReservationService reservationService, MessageSource messageSource, PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices, AuthenticationTrustResolver authenticationTrustResolver, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.userProfileService = userProfileService;
         this.carService = carService;
@@ -47,6 +42,7 @@ public class RentalCarController {
         this.messageSource = messageSource;
         this.persistentTokenBasedRememberMeServices = persistentTokenBasedRememberMeServices;
         this.authenticationTrustResolver = authenticationTrustResolver;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping(value = "/login")
@@ -60,69 +56,73 @@ public class RentalCarController {
 
     @GetMapping(value = {"/", "/homepage"})
     public String homepage(ModelMap model) {
-        model.addAttribute("customers", userService.getAllUsers());
         model.addAttribute("reservations", reservationService.getReservationsByUsername(getPrincipal()));
-        model.addAttribute("cars", carService.getAllCars());
         return "homepage";
     }
 
     @GetMapping("/registration")
     public String registrationForm(ModelMap model) {
         model.addAttribute("user", new User());
-        model.addAttribute("roles", userProfileService.getAllUserProfiles());
         return "registration";
     }
 
-    @PostMapping("/registration")
-    public String saveNewUser(@ModelAttribute("user") @Valid User user, BindingResult result, ModelMap model) {
-        if (result.hasErrors()) {
+    @PostMapping("/saveRegistration")
+    public String saveNewUser(@RequestParam("userId") int userId,
+                              @RequestParam("username") String username,
+                              @RequestParam("password") String password,
+                              @RequestParam("email") String email,
+                              @RequestParam("userProfile") int userProfileId, ModelMap model) {
+        User user;
+
+        if (!userService.isUsernameUnique(userId, username)) {
+            model.addAttribute("user", (userId != 0) ? userService.getById(userId) : new User());
+            model.addAttribute("mode", (userId != 0) ? "edit" : "");
+            model.addAttribute("usernameError", "Il nome utente è già in uso");
             return "registration";
         }
-        /*if (!userService.isUsernameUnique(user.getId(), user.getUsername())) {
-            FieldError ssoError = new FieldError("user", "username",
-                    messageSource.getMessage("non.unique.username", new String[]{user.getUsername()}, Locale.getDefault()));
-            result.addError(ssoError);
-            return "registration";
-        }*/
-        userService.saveUser(user);
+
+        if (userId != 0) {
+            user = userService.getById(userId);
+            setData(username, password, email, userProfileId, user);
+            userService.updateUser(user);
+        } else {
+            user = new User();
+            setData(username, password, email, userProfileId, user);
+            userService.saveUser(user);
+        }
+
         return "redirect:/homepage";
     }
 
-    @GetMapping("/editUser/{id}")
-    public String editUserForm(@PathVariable("id") int id, ModelMap model) {
+    private void setData(String username, String password, String email, int userProfileId, User user) {
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(email);
+        user.setUserProfiles(Set.of(userProfileService.getUserProfileById(userProfileId)));
+    }
+
+    @GetMapping("/editRegistration/{id}")
+    public String editRegistration(@PathVariable("id") int id, ModelMap model) {
         User user = userService.getById(id);
-        model.addAttribute("user", user);
-        model.addAttribute("roles", userProfileService.getAllUserProfiles());
-        return "editUser";
-    }
-
-    @PostMapping("/editUser")
-    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult result, ModelMap model) {
-        if (result.hasErrors()) {
-            return "editUser";
+        if (user == null) {
+            return "redirect:/homepage";
         }
-
-        userService.updateUser(user);
-        return "redirect:/homepage";
+        model.addAttribute("user", user);
+        model.addAttribute("mode", "edit");
+        return "registration";
     }
 
-    @GetMapping("/deleteUser/{id}")
-    public String deleteUser(@PathVariable int id, ModelMap model) {
+    @GetMapping("/deleteRegistration/{id}")
+    public String deleteUser(@PathVariable("id") int id) {
         userService.deleteUserById(id);
-        model.addAttribute("users", getUsers());
-        return "homepage";
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public String handleIllegalArgumentException(IllegalArgumentException ex, ModelMap model) {
-        model.addAttribute("errorMessage", ex.getMessage());
-        return "registration"; // Return to the registration form with error
+        return "redirect:/homepage";
     }
 
     @GetMapping(value = "/reservations")
     public String reservationForm(@RequestParam(value = "userId", required = false) Integer userId, ModelMap model) {
         List<Reservation> reservations;
 
+        //for filter
         if (userId != null) {
             User user = userService.getById(userId);
             reservations = reservationService.getReservationsByUsername(user.getUsername());
@@ -130,17 +130,15 @@ public class RentalCarController {
             reservations = reservationService.getAllReservations();
         }
 
-        model.addAttribute("cars", carService.getAllCars());
         model.addAttribute("reservations", reservations);
-        model.addAttribute("users", userService.getAllUsers());
         return "reservations";
     }
 
     @PostMapping("/saveReservations")
     public String saveReservation(@RequestParam("carId") int carId,
-                                     @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                     @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                     @RequestParam("reservationId") int reservationId) {
+                                  @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                  @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                  @RequestParam("reservationId") int reservationId) {
         Car car = carService.getCarById(carId);
         car.setAvailability(false);
         carService.updateCar(car);
@@ -160,7 +158,7 @@ public class RentalCarController {
             r.setStartDate(startDate);
             r.setEndDate(endDate);
             reservationService.updateReservation(r);
-        }else {
+        } else {
             reservationService.saveReservation(reservation);
         }
 
@@ -173,10 +171,7 @@ public class RentalCarController {
         if (reservation == null) {
             return "redirect:/homepage";
         }
-
-        List<Car> cars = carService.getAllCars();
         model.addAttribute("reservation", reservation);
-        model.addAttribute("cars", cars);
         model.addAttribute("mode", "edit");
 
         return "reservations";
@@ -205,34 +200,54 @@ public class RentalCarController {
         return "redirect:/homepage";
     }
 
-
-
     @GetMapping(value = {"/cars"})
-    public String viewCars(ModelMap model) {
-        model.addAttribute("cars", carService.getAllCars());
+    public String viewCars() {
         return "cars";
     }
 
-    @PostMapping("/addCar")
-    public String addCar(@RequestParam String brand,
-                         @RequestParam String model,
-                         @RequestParam int year,
-                         @RequestParam String licensePlate,
-                         @RequestParam boolean available) {
-        Car car = new Car(model, brand, year, licensePlate, available);
-        carService.saveCar(car);
+    @GetMapping(value = { "/addCar"})
+    public String addCarForm() {
+        return "addCar";
+    }
+
+    @PostMapping("/saveCar")
+    public String addCar(@RequestParam ("carId")int carId,
+                         @RequestParam ("brand")String brand,
+                         @RequestParam ("model")String model,
+                         @RequestParam ("year")int year,
+                         @RequestParam ("licensePlate")String licensePlate,
+                         @RequestParam ("available")boolean available) {
+        if(carId!=0){
+            Car car = carService.getCarById(carId);
+            car.setBrand(brand);
+            car.setModel(model);
+            car.setYear(year);
+            car.setLicensePlate(licensePlate);
+            car.setAvailability(available);
+            carService.updateCar(car);
+        }else{
+            Car car = new Car(model, brand, year, licensePlate, available);
+            carService.saveCar(car);
+        }
+
         return "redirect:/cars";
     }
 
-    @GetMapping("/deleteCar/{id}")
-    public String deleteCar(@PathVariable int id) {
-        carService.deleteCarById(id);
-        return "redirect:/cars";
-    }
     @GetMapping("/editCar/{id}")
-    public String editCar(@PathVariable int id) {
+    public String editCar(@PathVariable("id") int id, ModelMap model) {
         Car car = carService.getCarById(id);
-        carService.updateCar(car);
+        if (car == null) {
+            return "redirect:/cars";
+        }
+        model.addAttribute("mode", "edit");
+        model.addAttribute("car", car);
+
+        return "addCar";
+    }
+
+    @GetMapping("/deleteCar/{id}")
+    public String deleteCar(@PathVariable("id") int id) {
+        carService.deleteCarById(id);
         return "redirect:/cars";
     }
 
@@ -242,10 +257,28 @@ public class RentalCarController {
         return "profile";
     }
 
-    @RequestMapping(value = "/accessDenied", method = RequestMethod.GET)
+    @GetMapping(value = "/accessDenied")
     public String accessDeniedPage(ModelMap model) {
         model.addAttribute("loggedinuser", getPrincipal());
         return "accessDenied";
+    }
+
+    @GetMapping(value = "/logout")
+    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            persistentTokenBasedRememberMeServices.logout(request, response, auth);
+            SecurityContextHolder.getContext().setAuthentication(null);
+        }
+        return "redirect:/login?logout";
+    }
+
+    @ModelAttribute("loggedIN")
+    public String getLoggedIN() {
+        if (isCurrentAuthenticationAnonymous()) {
+            return null;
+        }
+        return getPrincipal();
     }
 
     @ModelAttribute("roles")
@@ -263,21 +296,13 @@ public class RentalCarController {
         return reservationService.getAllReservations();
     }
 
-    @ModelAttribute("loggedIN")
-    public String getLoggedIN() {
-        if (isCurrentAuthenticationAnonymous()) {
-            return null;
-        }
-        return getPrincipal();
-    }
-
     @ModelAttribute("users")
     public List<User> getUsers() {
         return userService.getAllUsers();
     }
 
     private String getPrincipal() {
-        String username = null;
+        String username;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserDetails) {

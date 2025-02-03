@@ -6,39 +6,32 @@
 </head>
 <body>
 <header>
+    <h1>Gestione Utente</h1>
     <div th:replace="fragments/header :: header"></div>
 </header>
-<div class="form-container">
-    <h2>Aggiungi Nuovo Utente</h2>
-    <form th:action="@{/registration}" th:object="${user}" method="post">
+<div class="container">
+    <h2 th:text="${mode == 'edit'} ? 'Modifica Utente' : 'Aggiungi Utente'"></h2>
+    <form th:action="@{/saveRegistration}" method="post">
+
+        <input type="hidden" th:name="userId" th:value="${mode == 'edit' ? user.id : 0}">
+
         <label for="username">Username:<span class="required">*</span></label>
-        <input type="text" id="username" th:field="*{username}" required/>
-        <div th:if="${#fields.hasErrors('username')}" class="error-message">
-            <span th:errors="*{username}">Username error</span>
-        </div>
-
+        <input type="text" id="username" name="username"
+               th:value="${user.username}" required/>
+        <p th:if="${usernameError}" th:text="${usernameError}" class="error"></p>
         <label for="password">Password:<span class="required">*</span></label>
-        <input type="password" id="password" th:field="*{password}" required/>
-        <div th:if="${#fields.hasErrors('password')}" class="error-message">
-            <span th:errors="*{password}">Password error</span>
-        </div>
-
+        <input type="password" id="password" name="password"
+               th:value="${user.password}" required/>
         <label for="email">Email:<span class="required">*</span></label>
-        <input type="email" id="email" th:field="*{email}" required/>
-        <div th:if="${#fields.hasErrors('email')}" class="error-message">
-            <span th:errors="*{email}">Email error</span>
-        </div>
+        <input type="email" id="email" name="email"
+               th:value="${user.email}" required/>
+        <label for="userProfile">Ruolo:</label>
+        <select id="userProfile" name="userProfile" required>
+            <option th:each="role : ${roles}" th:value="${role.id}"
+                    th:text="${role.type}"></option>
+        </select>
 
-        <label for="userProfiles">Ruolo:<span class="required">*</span></label>
-        <!--<select id="userProfiles" th:field="*{userProfiles}" required>-->
-            <input type="text" id="userProfiles" th:field="*{userProfiles}" required/>
-            <!--<option th:each="profile : ${roles}" th:value="${profile.type}" th:text="${profile.type}"></option>-->
-            <!--<div th:if="${#fields.hasErrors('userProfiles')}" class="error-message">
-                <span th:errors="*{userProfiles}">Role error</span>
-            </div>
-        </select>-->
-
-        <button type="submit">Salva Utente</button>
+        <button type="submit" th:text="${mode == 'edit'} ? 'Aggiorna Utente' : 'Salva Utente'"></button>
     </form>
 </div>
 </body>

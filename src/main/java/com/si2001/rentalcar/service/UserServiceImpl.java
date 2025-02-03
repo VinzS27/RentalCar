@@ -29,26 +29,16 @@ public class UserServiceImpl implements UserService {
         return dao.getUserByUsername(username);
     }
 
-	public List<User> getAllUsers() {
-		return dao.getAllUsers();
-	}
+    public List<User> getAllUsers() {
+        return dao.getAllUsers();
+    }
 
     public void saveUser(User user) {
         dao.saveUser(user);
     }
 
     public void updateUser(User user) {
-        User u = dao.getUserById(user.getId());
-
-        if (u != null) {
-			u.setUsername(user.getUsername());
-			u.setPassword(user.getPassword());
-            u.setEmail(user.getEmail());
-            if (user.getUserProfiles() != null) {
-                u.setUserProfiles(user.getUserProfiles());
-            }
-            dao.updateUser(u);
-        }
+        dao.updateUser(user);
     }
 
     public void deleteUserById(int id) {

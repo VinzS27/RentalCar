@@ -25,13 +25,13 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user : ${customers}">
+            <tr th:each="user : ${users}">
                 <td th:text="${user.username}">Username</td>
                 <td th:text="${user.email}">Email</td>
                 <td class="actions">
                     <a th:href="@{/reservations}">Visualizza</a>
-                    <a th:href="@{/editUser/{id}(id=${user.id})}">Modifica</a>
-                    <a th:href="@{/deleteUser/{id}(id=${user.id})}"
+                    <a th:href="@{/editRegistration/{id}(id=${user.id})}">Modifica</a>
+                    <a th:href="@{/deleteRegistration/{id}(id=${user.id})}"
                        onclick="return confirm('Sei sicuro di voler cancellare questo utente?');">Cancella</a>
                 </td>
             </tr>

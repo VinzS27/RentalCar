@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestione Auto</title>
+    <link rel="stylesheet" th:href="@{/static/style.css}"/>
+</head>
+<body>
+<header>
+    <h1>Gestione Auto</h1>
+    <div th:replace="fragments/header :: header"></div>
+</header>
+<div class="container">
+    <h2 th:text="${mode == 'edit'} ? 'Modifica Auto' : 'Aggiungi Auto'"></h2>
+    <form th:action="@{/saveCar}" method="post">
+        <input type="hidden" th:name="carId" th:value="${mode == 'edit' ? car.id : 0}">
+
+        <label for="brand">Brand:</label>
+        <input type="text" id="brand" name="brand"
+               th:value="${mode == 'edit' ? car.brand : ''}" required/>
+        <label for="model">Modello:</label>
+        <input type="text" id="model" name="model"
+               th:value="${mode == 'edit' ? car.model : ''}" required/>
+        <label for="year">Anno:</label>
+        <input type="number" id="year" name="year" min="1990" max="2025"
+               th:value="${mode == 'edit' ? car.year : ''}" required/>
+        <label for="licensePlate">licensePlate:</label>
+        <input type="text" id="licensePlate" name="licensePlate" maxlength="7" placeholder="AB123CD"
+               th:value="${mode == 'edit' ? car.licensePlate : ''}" required/>
+
+        <label for="availableT">Disponibile:
+        <input type="radio" name="available" id="availableT"
+               th:value="true" th:checked="${mode == 'edit' ? car.availability : false}"/>
+        </label>
+
+        <label for="availableF">Non Disponibile:
+        <input type="radio" name="available" id="availableF"
+               th:value="false" th:checked="${mode == 'edit' ? !car.availability : true}"/>
+        </label>
+
+        <button type="submit" th:text="${mode == 'edit'} ? 'Salva Auto' : 'Aggiungi Auto'"></button>
+    </form>
+</div>
+</body>
+</html>

@@ -42,7 +42,7 @@ public class ReservationDAOImpl extends AbstractDao<Integer, Reservation> implem
 
     public void deleteReservationById(int id) {
         Reservation reservation = (Reservation) getEntityManager()
-                .createQuery("SELECT u FROM Reservation u WHERE u.id = :id")
+                .createQuery("SELECT r FROM Reservation r WHERE r.id = :id")
                 .setParameter("id", id)
                 .getSingleResult();
         delete(reservation);

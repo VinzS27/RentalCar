@@ -37,7 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize ->
                         authorize.requestMatchers("/","homepage", "/reservations/**").hasAnyRole( "CUSTOMER","ADMIN")
-                                .requestMatchers("/registration/**", "/deleteUser/**","/editUser/**").hasRole("ADMIN")
+                                .requestMatchers("/registration/**", "/deleteUser/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
 
@@ -60,12 +60,10 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
         return http.build();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     @Bean
     public PersistentTokenBasedRememberMeServices getPersistentTokenBasedRememberMeServices() {

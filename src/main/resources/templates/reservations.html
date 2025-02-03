@@ -26,7 +26,7 @@
         </form>
 
         <!-- Tabella delle prenotazioni -->
-        <table>
+        <table class="table">
             <thead>
             <tr>
                 <th>Username</th>
@@ -44,12 +44,12 @@
                 <td th:text="${reservation.startDate}"></td>
                 <td th:text="${reservation.endDate}"></td>
                 <td th:text="${reservation.status}"></td>
-                <td>
-                    <form th:action="@{/approve-reservation}" method="post" style="display:inline;">
+                <td class="actions">
+                    <form th:action="@{/approve-reservation}" method="post">
                         <input type="hidden" name="reservationId" th:value="${reservation.id}">
                         <button type="submit" class="approve" th:disabled="${reservation.status == 'approvato'}">Approva</button>
                     </form>
-                    <form th:action="@{/decline-reservation}" method="post" style="display:inline;">
+                    <form th:action="@{/decline-reservation}" method="post">
                         <input type="hidden" name="reservationId" th:value="${reservation.id}">
                         <button type="submit" class="decline" th:disabled="${reservation.status == 'non approvato'}">Declina</button>
                     </form>

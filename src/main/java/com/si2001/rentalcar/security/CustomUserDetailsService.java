@@ -23,7 +23,6 @@ import com.si2001.rentalcar.model.UserProfile;
 public class CustomUserDetailsService implements UserDetailsService {
 
     static final Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
-
     private final UserService userService;
 
     @Autowired
@@ -45,7 +44,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
     private List<GrantedAuthority> getGrantedAuthorities(User user) {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> authorities = new ArrayList<>();
 
         for (UserProfile userProfile : user.getUserProfiles()) {
             logger.info("UserProfile : {}", userProfile);
