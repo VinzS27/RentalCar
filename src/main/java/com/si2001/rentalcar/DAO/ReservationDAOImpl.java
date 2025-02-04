@@ -1,6 +1,10 @@
 package com.si2001.rentalcar.DAO;
 
 import com.si2001.rentalcar.model.Reservation;
+import com.si2001.rentalcar.model.User;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,16 +17,20 @@ public class ReservationDAOImpl extends AbstractDao<Integer, Reservation> implem
     }
 
     public List<Reservation> getAllReservations() {
-        return getEntityManager()
-                .createQuery("SELECT r FROM Reservation r", Reservation.class)
-                .getResultList();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reservation> cq = cb.createQuery(Reservation.class);
+        Root<Reservation> root = cq.from(Reservation.class);
+        cq.select(root);
+        return entityManager.createQuery(cq).getResultList();
     }
 
+
     public Reservation getReservationStatus(String status) {
-        return (Reservation) getEntityManager()
-                .createQuery("SELECT r FROM Reservation r WHERE r.status LIKE :status")
-                .setParameter("status", status)
-                .getSingleResult();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reservation> cq = cb.createQuery(Reservation.class);
+        Root<Reservation> root = cq.from(Reservation.class);
+        cq.where(cb.like(root.get("status"), status));
+        return entityManager.createQuery(cq).getSingleResult();
     }
 
     public List<Reservation> getReservationsByUsername(String username) {
@@ -41,10 +49,11 @@ public class ReservationDAOImpl extends AbstractDao<Integer, Reservation> implem
     }
 
     public void deleteReservationById(int id) {
-        Reservation reservation = (Reservation) getEntityManager()
-                .createQuery("SELECT r FROM Reservation r WHERE r.id = :id")
-                .setParameter("id", id)
-                .getSingleResult();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reservation> cq = cb.createQuery(Reservation.class);
+        Root<Reservation> root = cq.from(Reservation.class);
+        cq.where(cb.equal(root.get("id"), id));
+        Reservation reservation = entityManager.createQuery(cq).getSingleResult();
         delete(reservation);
     }
 }

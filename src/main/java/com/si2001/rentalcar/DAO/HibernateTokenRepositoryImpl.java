@@ -2,6 +2,7 @@ package com.si2001.rentalcar.DAO;
 
 import java.util.Date;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,9 @@ public class HibernateTokenRepositoryImpl extends AbstractDao<String, Persistent
         persistentLogin.setToken(token.getTokenValue());
         persistentLogin.setLast_used(token.getDate());
         persist(persistentLogin);
-
     }
 
+    @Override
     public PersistentRememberMeToken getTokenForSeries(String seriesId) {
         logger.info("Fetch Token if any for seriesId : {}", seriesId);
         try {
@@ -47,7 +48,7 @@ public class HibernateTokenRepositoryImpl extends AbstractDao<String, Persistent
         }
     }
 
-
+    @Override
     public void removeUserTokens(String username) {
         PersistentLogin persistentLogin = null;
         logger.info("Removing Token if any for user : {}", username);
@@ -67,6 +68,7 @@ public class HibernateTokenRepositoryImpl extends AbstractDao<String, Persistent
 
     }
 
+    @Override
     public void updateToken(String seriesId, String tokenValue, Date lastUsed) {
         logger.info("Updating Token for seriesId : {}", seriesId);
         PersistentLogin persistentLogin = getByKey(seriesId);

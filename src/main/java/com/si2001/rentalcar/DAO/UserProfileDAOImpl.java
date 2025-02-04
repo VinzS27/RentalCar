@@ -1,6 +1,9 @@
 package com.si2001.rentalcar.DAO;
 
 import com.si2001.rentalcar.model.UserProfile;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,9 +16,11 @@ public class UserProfileDAOImpl extends AbstractDao<Integer, UserProfile> implem
     }
 
     public List<UserProfile> getAllUserProfile() {
-        return getEntityManager()
-                .createQuery("SELECT u FROM UserProfile u", UserProfile.class)
-                .getResultList();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserProfile> cq = cb.createQuery(UserProfile.class);
+        Root<UserProfile> root = cq.from(UserProfile.class);
+        cq.select(root);
+        return entityManager.createQuery(cq).getResultList();
     }
 
     public UserProfile getUserProfileByType(String type) {

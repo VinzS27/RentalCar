@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,23 +32,21 @@ public class SecurityConfiguration extends WebSecurityConfiguration {
         this.tokenRepository = tokenRepository;
     }
 
-    @Autowired
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize ->
                         authorize.requestMatchers("/","homepage", "/reservations/**").hasAnyRole( "CUSTOMER","ADMIN")
                                 .requestMatchers("/registration/**", "/deleteUser/**").hasRole("ADMIN")
-                                .anyRequest().authenticated())
+                                .anyRequest().permitAll())
 
                 .formLogin(form -> form.loginPage("/login")
-                        .loginProcessingUrl("/login")
                         .usernameParameter("username")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/homepage", true)
                         .permitAll())
 
                 .rememberMe(remember -> remember.rememberMeParameter("remember-me")
                         .tokenRepository(tokenRepository)
-                        .userDetailsService(userDetailsService)
                         .tokenValiditySeconds(86400)) // 24h
 
                 .exceptionHandling(exception ->

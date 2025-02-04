@@ -2,6 +2,9 @@ package com.si2001.rentalcar.DAO;
 
 import java.util.List;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -16,20 +19,22 @@ public class UserDAOImpl extends AbstractDao<Integer, User> implements UserDAO {
 	}
 
 	public User getUserByUsername(String username) {
-		List<User> users = getEntityManager()
-				.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
-				.setParameter("username", username)
-				.getResultList();
-
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<User> cq = cb.createQuery(User.class);
+		Root<User> root = cq.from(User.class);
+		cq.where(cb.equal(root.get("username"), username));
+		List<User> users = entityManager.createQuery(cq).getResultList();
 		return (users.isEmpty()) ? null : users.get(0);
 	}
 
-
 	public List<User> getAllUsers() {
-		return getEntityManager()
-				.createQuery("SELECT u FROM User u", User.class)
-				.getResultList();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<User> cq = cb.createQuery(User.class);
+		Root<User> root = cq.from(User.class);
+		cq.select(root);
+		return entityManager.createQuery(cq).getResultList();
 	}
+
 
 	public void updateUser(User u) {
 		update(u);
@@ -40,18 +45,21 @@ public class UserDAOImpl extends AbstractDao<Integer, User> implements UserDAO {
 	}
 
 	public void deleteUserById(int id) {
-		User user = (User) getEntityManager()
-				.createQuery("SELECT u FROM User u WHERE u.id = :id")
-				.setParameter("id", id)
-				.getSingleResult();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<User> cq = cb.createQuery(User.class);
+		Root<User> root = cq.from(User.class);
+		cq.where(cb.equal(root.get("id"), id));
+		User user = entityManager.createQuery(cq).getSingleResult();
 		delete(user);
 	}
 
 	public void deleteUserByUsername(String username) {
-		User user = (User) getEntityManager()
-				.createQuery("SELECT u FROM User u WHERE u.username LIKE :username")
-				.setParameter("username", username)
-				.getSingleResult();
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<User> cq = cb.createQuery(User.class);
+		Root<User> root = cq.from(User.class);
+		cq.where(cb.like(root.get("username"), username));
+		User user = entityManager.createQuery(cq).getSingleResult();
 		delete(user);
 	}
+
 }

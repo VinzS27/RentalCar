@@ -18,6 +18,7 @@ public class PersistentLogin implements Serializable {
     @Column(name = "token", unique = true, nullable = false)
     private String token;
 
+    @SuppressWarnings("deprecation")
     @Temporal(TemporalType.TIMESTAMP)
     private Date last_used;
 

@@ -3,8 +3,6 @@ package com.si2001.rentalcar.config;
 import com.si2001.rentalcar.converter.CarConverter;
 import com.si2001.rentalcar.converter.ReservationConverter;
 import com.si2001.rentalcar.converter.RoleToUserProfileConverter;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +12,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -24,20 +23,22 @@ import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = {"com.si2001.rentalcar"})
-public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
+public class AppConfig implements WebMvcConfigurer {
 
     final RoleToUserProfileConverter roleToUserProfileConverter;
     final CarConverter carConverter;
     final ReservationConverter reservationConverter;
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-    }
 
     public AppConfig(RoleToUserProfileConverter roleToUserProfileConverter, CarConverter carConverter, ReservationConverter reservationConverter) {
         this.roleToUserProfileConverter = roleToUserProfileConverter;
         this.carConverter = carConverter;
         this.reservationConverter = reservationConverter;
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/login").setViewName("login");
     }
 
     @Bean

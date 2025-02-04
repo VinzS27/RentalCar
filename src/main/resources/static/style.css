@@ -5,6 +5,16 @@ body {
     background-color: #f4f4f4;
 }
 
+.loginBody {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f4f4;
+}
+
 /*HEADER*/
 header {
     background-color: #333;
@@ -12,17 +22,29 @@ header {
     padding: 1rem;
 }
 
-header h1 {
+header h2 {
     margin: 0;
     font-size: 1.5rem;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 800px;
     margin: 2rem auto;
     background: #fff;
     padding: 1rem;
     border-radius: 8px;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.loginContainer {
+    max-width: 400px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 100%;
+    text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -102,7 +124,8 @@ nav ul li a:hover {
 label {
     font-weight: bold;
     display: block;
-    margin: 0.5rem 0 0.2rem;
+    margin-bottom: 5px;
+    text-align: left;
 }
 
 input, select, button {
@@ -138,4 +161,14 @@ button:hover {
     color: white;
     padding: 5px 10px;
     cursor: pointer;
+}
+
+.checkbox {
+    display: flex;
+    justify-content: space-between; /* Inverte l'ordine degli elementi */
+    margin-bottom: 1rem;
+}
+
+.checkbox label {
+    margin-right: -550px;
 }

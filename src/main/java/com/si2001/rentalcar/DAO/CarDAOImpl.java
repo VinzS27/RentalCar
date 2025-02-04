@@ -1,6 +1,9 @@
 package com.si2001.rentalcar.DAO;
 
 import com.si2001.rentalcar.model.Car;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,10 +16,13 @@ public class CarDAOImpl extends AbstractDao<Integer, Car> implements CarDAO {
     }
 
     public List<Car> getAllCars() {
-        return getEntityManager()
-                .createQuery("SELECT c FROM Car c", Car.class)
-                .getResultList();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Car> cq = cb.createQuery(Car.class);
+        Root<Car> root = cq.from(Car.class);
+        cq.select(root);
+        return entityManager.createQuery(cq).getResultList();
     }
+
 
     public void updateCar(Car car) {
         update(car);
@@ -27,10 +33,11 @@ public class CarDAOImpl extends AbstractDao<Integer, Car> implements CarDAO {
     }
 
     public void deleteCarById(int id) {
-        Car car = (Car) getEntityManager()
-                .createQuery("SELECT c FROM Car c WHERE c.id = :id")
-                .setParameter("id", id)
-                .getSingleResult();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Car> cq = cb.createQuery(Car.class);
+        Root<Car> root = cq.from(Car.class);
+        cq.where(cb.equal(root.get("id"), id));
+        Car car = entityManager.createQuery(cq).getSingleResult();
         delete(car);
     }
 }
