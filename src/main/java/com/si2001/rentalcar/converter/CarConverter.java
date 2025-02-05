@@ -11,11 +11,10 @@ public class CarConverter implements Converter<Object, Car> {
 
     final CarService carService;
 
-    @Autowired
     public CarConverter(CarService carService) {
         this.carService = carService;
     }
-    @Override
+
     public Car convert(Object o) {
         return carService.getCarById((Integer) o);
     }

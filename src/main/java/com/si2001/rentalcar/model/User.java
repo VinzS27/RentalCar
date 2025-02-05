@@ -16,21 +16,17 @@ public class User {
     private int id;
 
     @Column(name = "username", unique=true, nullable = false)
-    @NotEmpty
     private String username;
 
     @Column(name = "password", nullable = false)
-    @NotEmpty
     private String password;
 
     @Column(name = "email", unique=true, nullable = false)
-    @NotEmpty
     private String email;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Reservation> reservation;
 
-    @NotEmpty
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_profile_joinTable",
             joinColumns = { @JoinColumn(name = "user_id") },

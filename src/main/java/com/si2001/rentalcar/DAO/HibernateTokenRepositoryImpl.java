@@ -2,7 +2,6 @@ package com.si2001.rentalcar.DAO;
 
 import java.util.Date;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +56,7 @@ public class HibernateTokenRepositoryImpl extends AbstractDao<String, Persistent
                     .createQuery("SELECT p FROM PersistentLogin p WHERE p.username LIKE :username")
                     .setParameter("username", username)
                     .getSingleResult();
-        } catch (NoResultException noR) {
-
-        }
+        } catch (NoResultException ignored) {}
 
         if (persistentLogin != null) {
             logger.info("rememberMe was selected");

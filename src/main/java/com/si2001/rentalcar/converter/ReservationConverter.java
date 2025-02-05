@@ -14,7 +14,6 @@ public class ReservationConverter implements Converter<Object, Reservation> {
         this.reservationService = reservationService;
     }
 
-    @Override
     public Reservation convert(Object o) {
         return reservationService.getReservationById((Integer) o);
     }

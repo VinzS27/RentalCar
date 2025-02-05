@@ -23,7 +23,6 @@ public class CarDAOImpl extends AbstractDao<Integer, Car> implements CarDAO {
         return entityManager.createQuery(cq).getResultList();
     }
 
-
     public void updateCar(Car car) {
         update(car);
     }

@@ -6,13 +6,10 @@ import com.si2001.rentalcar.converter.RoleToUserProfileConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Description;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -29,16 +26,10 @@ public class AppConfig implements WebMvcConfigurer {
     final CarConverter carConverter;
     final ReservationConverter reservationConverter;
 
-
     public AppConfig(RoleToUserProfileConverter roleToUserProfileConverter, CarConverter carConverter, ReservationConverter reservationConverter) {
         this.roleToUserProfileConverter = roleToUserProfileConverter;
         this.carConverter = carConverter;
         this.reservationConverter = reservationConverter;
-    }
-
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login").setViewName("login");
     }
 
     @Bean
@@ -60,7 +51,7 @@ public class AppConfig implements WebMvcConfigurer {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
         templateEngine.setEnableSpringELCompiler(true);
-        templateEngine.addDialect(new SpringSecurityDialect());
+        templateEngine.addDialect(new SpringSecurityDialect());//per spring sec
         return templateEngine;
     }
 
@@ -85,11 +76,4 @@ public class AppConfig implements WebMvcConfigurer {
         return new SpringSecurityDialect();
     }
 
-    @Bean
-    @Description("Spring Message Resolver")
-    public ResourceBundleMessageSource messageSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("messages");
-        return messageSource;
-    }
 }

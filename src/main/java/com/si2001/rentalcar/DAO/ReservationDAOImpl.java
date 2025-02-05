@@ -24,7 +24,6 @@ public class ReservationDAOImpl extends AbstractDao<Integer, Reservation> implem
         return entityManager.createQuery(cq).getResultList();
     }
 
-
     public Reservation getReservationStatus(String status) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Reservation> cq = cb.createQuery(Reservation.class);
