@@ -4,6 +4,7 @@ import com.si2001.rentalcar.model.*;
 import com.si2001.rentalcar.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,11 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
+import java.util.Locale;
 
 @Controller
 public class RentalCarController {
@@ -66,38 +69,33 @@ public class RentalCarController {
     }
 
     @PostMapping("/saveRegistration")
-    public String saveNewUser(@RequestParam("userId") int userId,
-                              @RequestParam("username") String username,
-                              @RequestParam("password") String password,
-                              @RequestParam("email") String email,
-                              @RequestParam("userProfile") int userProfileId, ModelMap model) {
-        User user;
+    public String saveNewUser(@Valid User user, BindingResult bindingResult,
+                              @RequestParam("userId") int userId) {
 
-        if (!userService.isUsernameUnique(userId, username)) {
-            model.addAttribute("user", (userId != 0) ? userService.getById(userId) : new User());
-            model.addAttribute("mode", (userId != 0) ? "edit" : "");
-            model.addAttribute("usernameError", "Il nome utente è già in uso");
+        if (bindingResult.hasErrors()) {
             return "registration";
         }
 
-        if (userId != 0) {
-            user = userService.getById(userId);
-            setData(username, password, email, userProfileId, user);
-            userService.updateUser(user);
-        } else {
-            user = new User();
-            setData(username, password, email, userProfileId, user);
+        if (!userService.isUsernameUnique(user.getId(), user.getUsername()) && userId==0) {
+            FieldError error = new FieldError("user", "username",
+                    messageSource.getMessage("non.unique.username", new String[]{user.getUsername()}, Locale.getDefault()));
+            bindingResult.addError(error);
+            return "registration";
+        }
+
+        if(userId!=0) {
+            User u = userService.getById(userId);
+            u.setUsername(user.getUsername());
+            u.setPassword(passwordEncoder.encode(user.getPassword()));
+            u.setEmail(user.getEmail());
+            u.setUserProfiles(user.getUserProfiles());
+            userService.updateUser(u);
+        }else{
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             userService.saveUser(user);
         }
 
         return "redirect:/homepage";
-    }
-
-    private void setData(String username, String password, String email, int userProfileId, User user) {
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setEmail(email);
-        user.setUserProfiles(Set.of(userProfileService.getUserProfileById(userProfileId)));
     }
 
     @GetMapping("/editRegistration/{id}")

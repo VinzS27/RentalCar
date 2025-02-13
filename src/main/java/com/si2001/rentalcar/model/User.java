@@ -1,7 +1,7 @@
 package com.si2001.rentalcar.model;
 
 import jakarta.persistence.*;
-import org.hibernate.validator.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,18 +15,22 @@ public class User {
     @Column(name = "id")
     private int id;
 
+    @NotEmpty(message = "NotEmpty.user.username")
     @Column(name = "username", unique=true, nullable = false)
     private String username;
 
+    @NotEmpty(message = "NotEmpty.user.password")
     @Column(name = "password", nullable = false)
     private String password;
 
+    @NotEmpty(message = "NotEmpty.user.email")
     @Column(name = "email", unique=true, nullable = false)
     private String email;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Reservation> reservation;
 
+    @NotEmpty(message = "NotEmpty.user.userProfiles")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_profile_joinTable",
             joinColumns = { @JoinColumn(name = "user_id") },

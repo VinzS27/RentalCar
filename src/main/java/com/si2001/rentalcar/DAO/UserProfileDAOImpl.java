@@ -31,6 +31,6 @@ public class UserProfileDAOImpl extends AbstractDao<Integer, UserProfile> implem
                 .setParameter("type", normalizedType)
                 .getResultList();
 
-        return profiles.get(0); // Return the first result (assuming type is unique).
+        return (profiles.isEmpty())? null:profiles.get(0);
     }
 }
